@@ -225,6 +225,17 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .inventoryProductStock{margin:8px 0;padding:8px 10px;border:1px solid #d6e3f1;background:#f1f7fc;border-radius:7px;font-size:12px;font-weight:700;color:#174d76}
 .inventoryProductStock.pending{color:#695b42;background:#faf7ed;border-color:#eadfbc}
 #inventoryRefresh{min-height:40px}
+
+/* Black Friday: presentation of active November promotions */
+.productCard.blackFriday{border:2px solid #e8b83f;padding:9px;box-shadow:0 3px 12px #b8871720}
+.bfRibbon{background:#151515;color:#ffd86a;font-size:14px;font-weight:900;text-align:center;padding:9px 6px;margin:-9px -9px 10px;border-radius:5px 5px 0 0;letter-spacing:.5px}
+.bfPriceRow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.bfPriceRow .priceNow{margin:0;font-size:24px}
+.bfSaving{background:#ffdb72;color:#382900;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:850;text-align:center}
+.bfVolume{background:#fff0b6;color:#382900;border-radius:5px;padding:8px 6px;text-align:center;font-size:12px;font-weight:850;margin:6px 0}
+.bfExpiry{text-align:center;font-size:11px;color:#625222;margin:7px 0 10px}
+.bfFilter{display:inline-flex;align-items:center;gap:8px;background:#171717;color:#ffdc75;padding:10px 14px;border:1px solid #dfb342;border-radius:6px;font-size:12px;font-weight:750;margin-bottom:12px;cursor:pointer}
+.bfFilter input{accent-color:#dcae32;width:16px;height:16px}
 </style>
 <link rel="stylesheet" href="./account.css?v=20261102-1">
 </head>
@@ -810,17 +821,30 @@ function buildFilters(){
    note.textContent=divisionLabel(currentDivision)+" · "+pool.length+" productos · Fuente: "+source+". Los equipos sin precio de venta muestran “Precio por confirmar”.";
  }
 }
+function blackFridayPromo(p){
+ const promo=currentKey==='connected'?activePromo(p.sku):null;
+ return promo&&puertoRicoDate()>='2026-11-01'&&puertoRicoDate()<='2026-11-30'&&/^2026-11-/.test(promo.valid_through)?promo:null;
+}
+function promoDateLabel(value){
+ return new Intl.DateTimeFormat('es-PR',{day:'numeric',month:'long',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
+}
 function productCard(p){
  const price=clientPrice(p),regular=currentKey==='connected'?0:Number(p.map||p.convention||0),fav=favorites.includes(p.sku);
  const actualPromo=currentKey==='connected'?activePromo(p.sku):null;
  const baseline=actualPromo?((sapSaleBySku.get(stockSku(p.sku))||0)/100):regular;
  const regularHtml=(baseline&&price&&baseline>price)?'<div class="priceOld">'+money(baseline)+'</div>':'<div class="priceOld">&nbsp;</div>';
  const promo=currentKey==='connected'?activePromo(p.sku):null;
+ const bf=blackFridayPromo(p);
  const volumeLabel=promo?.volume_cents?'<div class="catalogSourceBadge">3 o más del mismo modelo: '+money(promo.volume_cents/100)+' c/u · hasta '+esc(promo.valid_through)+'</div>':'';
- const priceHtml=price?'<div class="priceNow">'+money(price)+'</div>'+volumeLabel:'<div class="noPrice">Precio por confirmar</div>';
+ let priceHtml=price?'<div class="priceNow">'+money(price)+'</div>'+volumeLabel:'<div class="noPrice">Precio por confirmar</div>';
+ if(bf&&price){
+   const savings=baseline>price?'<span class="bfSaving">Ahorras '+money(Math.round((baseline-price)*100)/100)+'</span>':'';
+   const volume=bf.volume_cents?'<div class="bfVolume">'+esc(String(bf.volume_min_qty||3))+' o más: '+money(bf.volume_cents/100)+' c/u</div>':'';
+   priceHtml='<div class="bfPriceRow"><div class="priceNow">'+money(price)+'</div>'+savings+'</div>'+volume+'<div class="bfExpiry">Válido hasta el '+esc(promoDateLabel(bf.valid_through))+'</div>';
+ }
  const stockHtml=!customerStockMode?'<div class="inventoryProductStock'+(stockCutoff?'':' pending')+'" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</div>':'';
  const action=price&&customerAvailability(p.sku)!=='out'&&availableOverride(p.sku)!==0?'<select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button>':'<button class="addBtn infoOnly" style="grid-column:1/-1" onclick="openProduct(\''+esc(p.sku)+'\')">Ver ficha</button>';
- return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+stockHtml+'<div class="cardActions">'+action+'</div></article>';
+ return '<article class="productCard'+(bf?' blackFriday':'')+'">'+(bf?'<div class="bfRibbon">⚡ BLACK FRIDAY</div>':'')+'<div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+stockHtml+'<div class="cardActions">'+action+'</div></article>';
 }
 function renderDashboard(){
  const priced=LARGE_PRODUCTS.filter(p=>clientPrice(p)>0);
@@ -828,8 +852,16 @@ function renderDashboard(){
  document.getElementById("featured").innerHTML=priced.slice(4,12).map(productCard).join("");
 }
 function renderCatalog(){
+ if(!document.getElementById('blackFridayOnly')){
+   const label=document.createElement('label');label.className='bfFilter';
+   label.innerHTML='<input type="checkbox" id="blackFridayOnly"> ⚡ Especiales Black Friday';
+   label.querySelector('input').addEventListener('change',renderCatalog);
+   document.getElementById('catalogGrid').before(label);
+ }
+
  const q=(document.getElementById("catalogSearch").value||"").toLowerCase(),cat=document.getElementById("categoryFilter").value,brand=document.getElementById("brandFilter").value,sort=document.getElementById("sortFilter").value;
  let arr=divisionProducts().filter(p=>(!q||[p.sku,p.brand,p.category,p.capacity,p.name,(p.specs||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!cat||p.category===cat)&&(!brand||p.brand===brand));
+ if(document.getElementById('blackFridayOnly').checked)arr=arr.filter(p=>blackFridayPromo(p));
  if(sort==="low")arr.sort((a,b)=>(clientPrice(a)||999999)-(clientPrice(b)||999999));else if(sort==="high")arr.sort((a,b)=>clientPrice(b)-clientPrice(a));
  const note=document.getElementById("catalogSourceNote");
  if(note){
@@ -1216,3 +1248,4 @@ setInterval(()=>{
 <script src="./master.js?v=20261111-karla-live-bridge"></script>
 </body>
 </html>
+
