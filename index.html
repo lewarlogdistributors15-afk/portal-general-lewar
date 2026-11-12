@@ -852,6 +852,7 @@ function renderDashboard(){
  document.getElementById("featured").innerHTML=priced.slice(4,12).map(productCard).join("");
 }
 function renderCatalog(){
+ const bfSeason=puertoRicoDate()>='2026-11-01'&&puertoRicoDate()<='2026-11-30';
  if(!document.getElementById('blackFridayOnly')){
    const label=document.createElement('label');label.className='bfFilter';
    label.innerHTML='<input type="checkbox" id="blackFridayOnly"> ⚡ Especiales Black Friday';
@@ -859,6 +860,9 @@ function renderCatalog(){
    document.getElementById('catalogGrid').before(label);
  }
 
+ const bfCheckbox=document.getElementById('blackFridayOnly');
+ bfCheckbox.parentElement.classList.toggle('hidden',!bfSeason);
+ if(!bfSeason)bfCheckbox.checked=false;
  const q=(document.getElementById("catalogSearch").value||"").toLowerCase(),cat=document.getElementById("categoryFilter").value,brand=document.getElementById("brandFilter").value,sort=document.getElementById("sortFilter").value;
  let arr=divisionProducts().filter(p=>(!q||[p.sku,p.brand,p.category,p.capacity,p.name,(p.specs||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!cat||p.category===cat)&&(!brand||p.brand===brand));
  if(document.getElementById('blackFridayOnly').checked)arr=arr.filter(p=>blackFridayPromo(p));
@@ -1248,4 +1252,5 @@ setInterval(()=>{
 <script src="./master.js?v=20261111-karla-live-bridge"></script>
 </body>
 </html>
+
 
