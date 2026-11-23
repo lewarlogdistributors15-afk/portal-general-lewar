@@ -14,8 +14,8 @@
     .access { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .4rem 1rem; background: #284d68; color: white; }
     .access strong { font-size: 1rem; }
     .access nav { display: flex; gap: .5rem; align-items: center; }
-    .access a, .access button { padding: .35rem .65rem; border: 1px solid #b8cbd8; border-radius: .25rem; background: #eef4f8; color: #17384d; text-decoration: none; font: inherit; font-size: .875rem; cursor: pointer; }
-    .access a:focus-visible, .access button:focus-visible { outline: 3px solid #ffd463; outline-offset: 2px; }
+    .access button { padding: .35rem .65rem; border: 1px solid #b8cbd8; border-radius: .25rem; background: #eef4f8; color: #17384d; font: inherit; font-size: .875rem; cursor: pointer; }
+    .access button:focus-visible { outline: 3px solid #ffd463; outline-offset: 2px; }
     .erp { display: block; width: 100%; flex: 1; min-height: 0; border: 0; }
     noscript p { padding: 1rem; margin: 0; background: white; color: #17384d; }
   </style>
@@ -23,8 +23,7 @@
 <body>
   <header class="access">
     <strong>Lewar ERP</strong>
-    <nav aria-label="Acceso al ERP">
-      <a href="https://erp.lewardistributors.com/signin-with-chatgpt?return_to=%2F" target="_blank" rel="noopener noreferrer">Iniciar sesión</a>
+    <nav aria-label="Controles del ERP">
       <button type="button" onclick="location.reload()">Actualizar</button>
     </nav>
   </header>
