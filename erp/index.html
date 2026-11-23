@@ -8,13 +8,27 @@
   <link rel="canonical" href="https://www.lewardistributors.com/erp">
   <title>Lewar ERP</title>
   <style>
+    * { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #e9eff5; }
-    .erp { display: block; width: 100%; height: 100%; height: 100dvh; border: 0; }
-    noscript p { position: fixed; inset: auto 1rem 1rem; padding: 1rem; background: white; color: #17384d; font: 1rem/1.5 system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; height: 100dvh; font: 1rem/1.4 system-ui, sans-serif; }
+    .access { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .4rem 1rem; background: #284d68; color: white; }
+    .access strong { font-size: 1rem; }
+    .access nav { display: flex; gap: .5rem; align-items: center; }
+    .access a, .access button { padding: .35rem .65rem; border: 1px solid #b8cbd8; border-radius: .25rem; background: #eef4f8; color: #17384d; text-decoration: none; font: inherit; font-size: .875rem; cursor: pointer; }
+    .access a:focus-visible, .access button:focus-visible { outline: 3px solid #ffd463; outline-offset: 2px; }
+    .erp { display: block; width: 100%; flex: 1; min-height: 0; border: 0; }
+    noscript p { padding: 1rem; margin: 0; background: white; color: #17384d; }
   </style>
 </head>
 <body>
-  <iframe class="erp" title="Lewar ERP" src="https://lewar-erp-piloto.emmatowwerz15.chatgpt.site/" allow="camera; clipboard-write; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <header class="access">
+    <strong>Lewar ERP</strong>
+    <nav aria-label="Acceso al ERP">
+      <a href="https://erp.lewardistributors.com/signin-with-chatgpt?return_to=%2F" target="_blank" rel="noopener noreferrer">Iniciar sesión</a>
+      <button type="button" onclick="location.reload()">Actualizar</button>
+    </nav>
+  </header>
+  <iframe class="erp" title="Lewar ERP" src="https://erp.lewardistributors.com/" allow="camera; clipboard-write; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
   <noscript><p>Activa JavaScript en tu navegador para utilizar el ERP de Lewar.</p></noscript>
 </body>
 </html>
